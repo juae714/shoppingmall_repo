@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <title>homework</title>
+
+    <style>
+        .wrap {
+            width: 600px;
+            margin: 30px auto;
+
+        }
+
+
+        .mytitle {
+            width: 600px;
+            margin: auto;
+
+
+        }
+
+        #post-box {
+            width: 600px;
+            margin: 20px auto;
+
+        }
+
+
+        #order-form {
+            width: 600px;
+            margin: auto;
+
+        }
+
+        .button {
+            width: 40px;
+            margin: auto;
+
+        }
+    </style>
+
+    <script>
+        function hey() {
+
+
+
+
+            let name = $('#name').val();
+            let number = $('#count').val();
+            let address = $('#address').val();
+            let phone = $('#phone').val();
+
+
+
+            if (name == '') {
+                alert('이름을 입력해주세요')
+                return
+
+            } else if (number == '수량을 선택하세요') {
+                alert('수량을 입력해주세요')
+                return
+
+            } else if (address == '') {
+                alert('주소를 입력해주세요')
+                return
+
+            } else if (phone == '') {
+                alert('전화번호를 입력해주세요')
+                return
+
+            }
+
+            $.ajax({
+                type: "POST",
+                url: "/orders",
+                data: { name_give: name, number_give: number, address_give: address, phone_give: phone },
+                success: function (response) {
+                    if (response['result'] == 'success')
+                        alert(response['msg']);
+                    window.location.reload();
+
+
+                }
+
+
+
+
+            })
+
+        }
+
+        $(document).ready(function () {
+
+            $.ajax({
+                type: "GET",
+                url: "https://api.manana.kr/exchange/rate.json",
+                data: {},
+                success: function (response) {
+                    let exchange = response[1]['rate']
+                    $('#meaning').text(exchange)
+
+
+
+                }
+            });
+            listing();
+
+
+
+        });
+
+        function listing() {
+
+            $.ajax({
+                type: "GET",
+                url: "/orders",
+                data: {},
+                success: function (response) {
+                    if (response['result'] == 'success') {
+
+                        let orderlist = response['all_order'];
+
+                        for (let i = 0; i < orderlist.length; i++) {
+                            let name = orderlist[i]['name']
+                            let number = orderlist[i]['number']
+                            let address = orderlist[i]['address']
+                            let phone = orderlist[i]['phone']
+
+                            let temp_html = `<tr>
+                                                <td>${name}</td>
+                                                <td>${number}</td>
+                                                <td>${address}</td>
+                                                <td>${phone}</td>
+                                            </tr>`
+                            $('#orderlist-box').append(temp_html)
+
+
+                        }
+
+
+                    } else {
+                        alert('주문을 받아오지 못했습니다');
+                    }
+                }
+            });
+        }
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+</head>
+
+<body>
+    <div class="wrap">
+        <!--여기는 상품 사진입니다-->
+        <div class='mytitle'>
+            <img src="{{ url_for('static', filename='bag.jpeg') }}" />
+        </div>
+        <!--여기는 상품 설명입니다-->
+        <div id="post-box">
+            <h1>샤넬 가방</h1>
+            <h5>가격: 5,000,000원 / 개 </h5>
+            <p>
+            <h5>이 상품으로 말할 것 같으면 어쩌구 저쩌구</h5>
+            달러 원 환율: <span id="meaning"></span>
+            </p>
+        </div>
+        <!--여긴 주문하기입니다-->
+        <div>
+            <h1>주문하기</h1>
+        </div>
+        <div id="order-form">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-default">주문자 이름</span>
+                </div>
+                <input type="text" class="form-control" id="name" aria-label="Default"
+                    aria-describedby="inputGroup-sizing-default">
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="inputGroupSelect01">수량</label>
+                </div>
+                <select class="custom-select" id="count">
+                    <option selected>수량을 선택하세요</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-default">주소</span>
+                </div>
+                <input type="text" class="form-control" id="address" aria-label="Default"
+                    aria-describedby="inputGroup-sizing-default">
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-default">전화번호</span>
+                </div>
+                <input type="text" class="form-control" id="phone" aria-label="Default"
+                    aria-describedby="inputGroup-sizing-default">
+            </div>
+
+            <div class="button">
+                <button onclick="hey()" type="button" class="btn btn-primary">주문하기</button>
+            </div>
+
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">이름</th>
+                    <th scope="col">수량</th>
+                    <th scope="col">주소</th>
+                    <th scope="col">전화번호</th>
+                </tr>
+            </thead>
+            <tbody id="orderlist-box">
+                <tr>
+                    <td>1</td>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                    <td>@mdo</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</body>
+
+</html>
